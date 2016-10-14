@@ -2,12 +2,12 @@
   (let i (uniq)
     `(if (is nil ,list)
        nil
-       (withs (,i 0
-               ,var (,list ,i)
-               next (fn ()
-                      (++ ,i)
-                      (= ,var (,list ,i))))
-         (while (< ,i (len ,list))
+       (withs (els ,list
+               ,i 0
+               ,var (els ,i)
+               next (fn () (++ ,i)))
+         (while (< ,i (len els))
+           (= ,var (els ,i))
            ,@body
            (next))))))
 
