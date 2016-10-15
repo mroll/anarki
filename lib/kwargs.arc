@@ -1,15 +1,17 @@
-(mac iter (var list . body)
-  (let i (uniq)
-    `(if (is nil ,list)
-       nil
-       (withs (els ,list
-               ,i 0
-               ,var (els ,i)
-               next (fn () (++ ,i)))
-         (while (< ,i (len els))
-           (= ,var (els ,i))
-           ,@body
-           (next))))))
+(mac iter (var lst . body)
+    (w/uniq (i elst)
+      `(let ,elst ,lst
+        (if (is ,elst nil)
+          nil
+          (withs (,i 0
+                  ,var (,elst ,i)
+                  next (fn ()
+                         (++ ,i)
+                         (= ,var (,elst ,i))))
+            (while (< ,i (len ,elst))
+              (= ,var (,elst ,i))
+              ,@body
+              (++ ,i)))))))
 
 (def 1+ (n)
   (+ 1 n))
@@ -52,35 +54,35 @@
          (w/kwargs ,kwargs args
            ,@body)))))
 
-; (ndef fullname (msg --keys (first "Abe") (last "Lincoln"))
-;   (prn first " " last " says " msg))
-; 
-; (fullname "four score and...")
+(ndef fullname (msg --keys (first "Abe") (last "Lincoln"))
+  (prn first " " last " says " msg))
+
+(fullname "four score and...")
 ; => Abe Lincoln says four score and..."
-; 
-; (fullname "hey, you sass that hoopy frood...?" 'last "Prefect" 'first "Ford")
+
+(fullname "hey, you sass that hoopy frood...?" 'last "Prefect" 'first "Ford")
 ; => Ford Prefect says hey, you sass that hoopy frood...?
-; 
-; (mac argparse (args . case-body)
-;   (let arg (uniq)
-;     `(iter ,arg ,args
-;        (case ,arg
-;          ,@case-body))))
-; 
-; (def scrape (addr . args)
-;   (with (outfile ((tokens addr #\/) -1)
-;          use-ssl nil)
-;     (argparse args
-;       -o   (= outfile (next))
-;       -ssl (= use-ssl t))
-;     (prn outfile)
-;     (prn use-ssl)))
-; 
-; (ndef scrape (addr --keys (outfile ((tokens addr #\/) -1)) use-ssl)
-;   (prn outfile)
-;   (prn use-ssl))
-; 
-; 
-; (scrape "www.foo.com/index.html" '-o "foo.html")
+
+(mac argparse (args . case-body)
+  (let arg (uniq)
+    `(iter ,arg ,args
+       (case ,arg
+         ,@case-body))))
+
+(def scrape (addr . args)
+  (with (outfile ((tokens addr #\/) -1)
+         use-ssl nil)
+    (argparse args
+      -o   (= outfile (next))
+      -ssl (= use-ssl t))
+    (prn outfile)
+    (prn use-ssl)))
+
+(ndef scrape (addr --keys (outfile ((tokens addr #\/) -1)) use-ssl)
+  (prn outfile)
+  (prn use-ssl))
+
+
+(scrape "www.foo.com/index.html" '-o "foo.html")
 ; => foo.html
 ;    t
